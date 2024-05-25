@@ -9,12 +9,32 @@ import pandas as pd
 # Import yfinance
 import yfinance as yf
 
+# Import a bunch of machine learning models from sklearn
+from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.svm import SVR
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+
 # Import the required libraries
 from statsmodels.tsa.ar_model import AutoReg
 
 # Define training and testing size
 TRAIN_SIZE = 0.7
 TEST_SIZE = 0.3
+
+# Create a dictionary of models
+models_dict = {
+    "Linear Regression": LinearRegression(),
+    "Ridge": Ridge(),
+    "Lasso": Lasso(),
+    "Elastic Net": ElasticNet(),
+    "Random Forest": RandomForestRegressor(),
+    "Gradient Boosting": GradientBoostingRegressor(),
+    "Support Vector Machine": SVR(),
+    "K-Nearest Neighbors": KNeighborsRegressor(),
+    "Decision Tree": DecisionTreeRegressor(),
+}
 
 #Define a dictionary for our saved models
 
@@ -31,7 +51,6 @@ TEST_SIZE = 0.3
 
     # Return the dictionary
     #return stock_dict
-
 
 # Create function to fetch periods and intervals
 def fetch_periods_intervals():
@@ -159,7 +178,9 @@ def fetch_stock_history(stock_ticker, period, interval):
 
 
 # Function to generate the stock prediction
-def generate_stock_prediction(stock_ticker):
+def generate_stock_prediction(stock_ticker, model):
+
+    model = models_dict[model]
     # Try to generate the predictions
     try:
         # Pull the data for the first security
@@ -182,7 +203,7 @@ def generate_stock_prediction(stock_ticker):
         test_df = stock_data_close.iloc[int(len(stock_data_close) * TEST_SIZE) :]  # 30%
 
         # Define training model
-        model = AutoReg(train_df["Close"], 250).fit(cov_type="HC0")
+        model = model(train_df["Close"], 250).fit()
 
         # Predict data for test data
         predictions = model.predict(
