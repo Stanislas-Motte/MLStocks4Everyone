@@ -5,32 +5,69 @@ import streamlit as st
 # Import helper functions
 from helper import *
 
+# Import a bunch of machine learning models from sklearn
+from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.svm import SVR
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from xgboost import XGBRegressor
+
+models_dict = {
+    "Linear Regression": LinearRegression(),
+    "Ridge": Ridge(),
+    "Lasso": Lasso(),
+    "Elastic Net": ElasticNet(),
+    "Random Forest": RandomForestRegressor(),
+    "Gradient Boosting": GradientBoostingRegressor(),
+    "Support Vector Machine": SVR(),
+    "K-Nearest Neighbors": KNeighborsRegressor(),
+    "Decision Tree": DecisionTreeRegressor(),
+    "XGBoost": XGBRegressor()
+}
+
+#Create a dict of top 10 stocks including FAANG
+stock_dict = {
+    "Apple Inc.": "AAPL",
+    "Amazon.com Inc.": "AMZN",
+    "Alphabet Inc.": "GOOGL",
+    "Facebook Inc.": "FB",
+    "Netflix Inc.": "NFLX",
+    "Tesla Inc.": "TSLA",
+    "Microsoft Corporation": "MSFT",
+    "Alibaba Group Holding Limited": "BABA",
+    "NVIDIA Corporation": "NVDA",
+    "PayPal Holdings Inc.": "PYPL",
+    "GameStop Corp.": "GME",
+    }
+
 # Configure the page
 st.set_page_config(
     page_title="Stock Price Predictor 3000",
     page_icon="📈",
 )
 
-
 #####Sidebar Start#####
 
 # Add a sidebar
 st.sidebar.markdown("## **User Input Features**")
 
-# Fetch and store the stock data
-stock_dict = fetch_stocks()
-
 # Add a dropdown for selecting the stock
 st.sidebar.markdown("### **Select stock**")
 stock = st.sidebar.selectbox("Choose a stock", list(stock_dict.keys()))
-st.sidebar.markdown("### **Select a Model**")
-model = st.sidebar.selectbox("Choose a model", list(stock_dict.keys())) # need to create a dict for models instead of stocks.
-# Add a selector for stock exchange
-st.sidebar.markdown("### **Select stock exchange**")
-stock_exchange = st.sidebar.radio("Choose a stock exchange", ("BSE", "NSE"), index=0)
 
-# Build the stock ticker
-stock_ticker = f"{stock_dict[stock]}.{'BO' if stock_exchange == 'BSE' else 'NS'}"
+# Add a dropdown for selecting the model
+st.sidebar.markdown("### **Select a Model**")
+model = st.sidebar.selectbox("Choose a model", list(models_dict.keys())) # need to create a dict for models instead of stocks.
+
+# # Add a selector for stock exchange
+# st.sidebar.markdown("### **Select stock exchange**")
+# stock_exchange = st.sidebar.radio("Choose a stock exchange", ("BSE", "NSE"), index=0)
+
+# # Build the stock ticker
+# stock_ticker = f"{stock_dict[stock]}.{'BO' if stock_exchange == 'BSE' else 'NS'}"
+
+stock_ticker = stock_dict[stock]
 
 # Add a disabled input for stock ticker
 st.sidebar.markdown("### **Stock ticker**")
@@ -49,9 +86,6 @@ period = st.sidebar.selectbox("Choose a period", list(periods.keys()))
 st.sidebar.markdown("### **Select interval**")
 interval = st.sidebar.selectbox("Choose an interval", periods[period])
 
-#####Sidebar End#####
-
-
 #####Title#####
 
 # Add title to the app
@@ -65,7 +99,6 @@ st.markdown("##### **Enhance Investment Decisions through Data-Driven Forecastin
 
 # Fetch the stock historical data
 stock_data = fetch_stock_history(stock_ticker, period, interval)
-
 
 #####Historical Data Graph#####
 
@@ -97,7 +130,10 @@ st.plotly_chart(fig, use_container_width=True)
 #####Stock Prediction Graph#####
 
 # Unpack the data
-train_df, test_df, forecast, predictions = generate_stock_prediction(stock_ticker)
+train_df, test_df, forecast, predictions = generate_stock_prediction(stock_ticker, model)
+
+st.write(forecast)
+st.write(predictions)
 
 # Check if the data is not None
 if train_df is not None and (forecast >= 0).all() and (predictions >= 0).all():
