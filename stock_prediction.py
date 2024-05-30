@@ -46,7 +46,13 @@ st.set_page_config(
     page_title="Stock Price Predictor 3000",
     page_icon="📈",
 )
-
+## Import tickers
+df = pd.read_csv('/Users/user/code/Stanislas-Motte/MLStocks4Everyone/our_data/AAPL.csv/our_data/AAPL.csv')
+from pprint import pprint
+ticker_symbol = 'TSLA'
+ticker = yf.Ticker(ticker_symbol)
+info = ticker.info
+st.write((f"Address: {info['address1']}, Stock Sector: {info['industry']}, CEO: {info['companyOfficers'][0]['name']}"))
 #####Sidebar Start#####
 
 # Add a sidebar
