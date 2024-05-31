@@ -154,7 +154,7 @@ def generate_stock_prediction(stock_ticker, model):
 
         stock_data_close.columns = ['DATETIME', 'price']
 
-        st.write('here is the error')
+        #Create all the relevant features
         X, y = set_up_df(stock_data_close)
 
         st.write('here is the error again')

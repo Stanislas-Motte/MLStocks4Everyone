@@ -125,8 +125,6 @@ fig.update_layout(xaxis_rangeslider_visible=False)
 st.plotly_chart(fig, use_container_width=True)
 
 #####Historical Data Graph End#####
-
-
 #####Stock Prediction Graph#####
 
 # Unpack the data
@@ -161,8 +159,8 @@ if price_predictions_df is not None:
                 line=dict(color="orange"),
             ),
             go.Scatter(
-                x=price_predictions_df.index,
-                y=price_predictions_df['price']+10,
+                x=stock_data_close_test.index,
+                y=price_predictions_df['price'],
                 name="Forecast",
                 mode="lines",
                 line=dict(color="red"),
@@ -210,6 +208,14 @@ if price_predictions_df is not None:
 
     # Use the native streamlit theme.
     st.plotly_chart(fig, use_container_width=True)
+
+    def return_buy_sell_message():
+        if price_predictions_df['price'][0] - stock_data_close_test['price'][1] > 0:
+            return 'The model recommend you to buy the stock and sell it tomorrow'
+        else:
+            return 'Sell'
+
+    st.write(f'The model recommend that you {return_buy_sell_message()}')
 
 # If the data is None
 else:
