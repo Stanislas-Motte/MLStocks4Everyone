@@ -1,14 +1,12 @@
 ### ML Stock Selection 4 Everyone
 
 
-## Data
+## RELEVANT FILES
 
-We will use time series data from in CSV fr
-https://github.com/robcarver17/pysystemtrade/tree/master/data/futures/adjusted_prices_csv
+As of May 31 2024, the only relevant files are 
 
+helper2.py
+stock_prediction.py
 
-
-
-
-## Models
+That is it! Everything needed is in there!
 
