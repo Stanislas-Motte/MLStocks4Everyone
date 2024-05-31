@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 # Import helper functions
-from helper import *
+from helper2 import *
 
 # Import a bunch of machine learning models from sklearn
 from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
@@ -46,13 +46,7 @@ st.set_page_config(
     page_title="Stock Price Predictor 3000",
     page_icon="📈",
 )
-## Import tickers
-df = pd.read_csv('/Users/user/code/Stanislas-Motte/MLStocks4Everyone/our_data/AAPL.csv/our_data/AAPL.csv')
-from pprint import pprint
-ticker_symbol = 'TSLA'
-ticker = yf.Ticker(ticker_symbol)
-info = ticker.info
-st.write((f"Address: {info['address1']}, Stock Sector: {info['industry']}, CEO: {info['companyOfficers'][0]['name']}"))
+
 #####Sidebar Start#####
 
 # Add a sidebar
@@ -136,49 +130,80 @@ st.plotly_chart(fig, use_container_width=True)
 #####Stock Prediction Graph#####
 
 # Unpack the data
-train_df, test_df, forecast, predictions = generate_stock_prediction(stock_ticker, model)
+stock_data_close_train, stock_data_close_test, price_predictions_df = generate_stock_prediction(stock_ticker, model)
 
-st.write(forecast)
-st.write(predictions)
+#st.write(forecast)
+#st.write(predictions)
+
+st.write(price_predictions_df)
+st.write(stock_data_close_test)
 
 # Check if the data is not None
-if train_df is not None and (forecast >= 0).all() and (predictions >= 0).all():
+if price_predictions_df is not None:
     # Add a title to the stock prediction graph
     st.markdown("## **Stock Prediction**")
 
-    # Create a plot for the stock prediction
     fig = go.Figure(
+
         data=[
             go.Scatter(
-                x=train_df.index,
-                y=train_df["Close"],
+                x=stock_data_close_train.index,
+                y=stock_data_close_train["price"],
                 name="Train",
                 mode="lines",
                 line=dict(color="blue"),
             ),
             go.Scatter(
-                x=test_df.index,
-                y=test_df["Close"],
+                x=stock_data_close_test.index,
+                y=stock_data_close_test["price"],
                 name="Test",
                 mode="lines",
                 line=dict(color="orange"),
             ),
             go.Scatter(
-                x=forecast.index,
-                y=forecast,
+                x=price_predictions_df.index,
+                y=price_predictions_df['price']+10,
                 name="Forecast",
                 mode="lines",
                 line=dict(color="red"),
             ),
-            go.Scatter(
-                x=test_df.index,
-                y=predictions,
-                name="Test Predictions",
-                mode="lines",
-                line=dict(color="green"),
-            ),
         ]
     )
+
+    # Create a plot for the stock prediction
+    # fig = go.Figure(
+
+    #     data=[
+    #         go.Scatter(
+    #             x=train_df.index,
+    #             y=train_df["price"],
+    #             name="Train",
+    #             mode="lines",
+    #             line=dict(color="blue"),
+    #         ),
+    #         go.Scatter(
+    #             x=test_df.index,
+    #             y=test_df["price"],
+    #             name="Test",
+    #             mode="lines",
+    #             line=dict(color="orange"),
+    #         ),
+    #         go.Scatter(
+    #             x=forecast.index,
+    #             y=forecast,
+    #             name="Forecast",
+    #             mode="lines",
+    #             line=dict(color="red"),
+    #         ),
+    #         go.Scatter(
+    #             x=test_df.index,
+    #             y=predictions,
+    #             name="Test Predictions",
+    #             mode="lines",
+    #             line=dict(color="green"),
+    #         ),
+    #     ]
+    # )
 
     # Customize the stock prediction graph
     fig.update_layout(xaxis_rangeslider_visible=False)
