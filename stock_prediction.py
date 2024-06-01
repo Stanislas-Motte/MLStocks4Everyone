@@ -12,6 +12,8 @@ from sklearn.svm import SVR
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
 from xgboost import XGBRegressor
+import yfinance as yf
+import time
 
 models_dict = {
     "Linear Regression": LinearRegression(),
@@ -28,17 +30,17 @@ models_dict = {
 
 #Create a dict of top 10 stocks including FAANG
 stock_dict = {
-    "Apple Inc.": "AAPL",
-    "Amazon.com Inc.": "AMZN",
-    "Alphabet Inc.": "GOOGL",
-    "Facebook Inc.": "FB",
-    "Netflix Inc.": "NFLX",
-    "Tesla Inc.": "TSLA",
-    "Microsoft Corporation": "MSFT",
-    "Alibaba Group Holding Limited": "BABA",
-    "NVIDIA Corporation": "NVDA",
-    "PayPal Holdings Inc.": "PYPL",
-    "GameStop Corp.": "GME",
+    "Apple Inc. 🍏": "AAPL",
+    "Amazon.com Inc.📦": "AMZN",
+    "Alphabet Inc. 🔤": "GOOGL",
+    #"Facebook Inc.": "FB", # because stock info is NaN
+    "Netflix Inc.🍿": "NFLX",
+    "Tesla Inc.⚡": "TSLA",
+    "Microsoft Corporation 🌐": "MSFT",
+    "Alibaba Group Holding Limited 🧞‍♂️": "BABA",
+    "NVIDIA Corporation 📟": "NVDA",
+    "PayPal Holdings Inc. 💵": "PYPL",
+    "GameStop Corp. 🎮": "GME",
     }
 
 # Configure the page
@@ -56,6 +58,7 @@ st.sidebar.markdown("## **User Input Features**")
 st.sidebar.markdown("### **Select stock**")
 stock = st.sidebar.selectbox("Choose a stock", list(stock_dict.keys()))
 
+
 # Add a dropdown for selecting the model
 st.sidebar.markdown("### **Select a Model**")
 model = st.sidebar.selectbox("Choose a model", list(models_dict.keys())) # need to create a dict for models instead of stocks.
@@ -68,6 +71,29 @@ model = st.sidebar.selectbox("Choose a model", list(models_dict.keys())) # need 
 # stock_ticker = f"{stock_dict[stock]}.{'BO' if stock_exchange == 'BSE' else 'NS'}"
 
 stock_ticker = stock_dict[stock]
+# ticker = yf.Ticker(stock_ticker)
+# address = ticker.info['address1']
+# city = ticker.info['city']
+# state = ticker.info['state']
+# country = ticker.info['country']
+# industry = ticker.info['industry']
+# sector = ticker.info['sectorDisp']
+# CEO = ticker.info['companyOfficers'][0]['name']
+
+
+# st.subheader(f"About {stock}")
+# #put the stock name in the center of the list
+# st.markdown(f"<h3 style='text-align: center;'></h3>", unsafe_allow_html=True)
+
+# col1, col2 = st.columns(2)
+# with col1:
+#      st.markdown(f"**Address:** {address}, {city}, {state}, {country}")
+#      st.markdown(f"**Industry:** {industry}")
+# with col2:
+#      st.markdown(f"**Sector:** {sector}")
+#      st.markdown(f"**CEO:** {CEO}")
+
+
 
 # Add a disabled input for stock ticker
 st.sidebar.markdown("### **Stock ticker**")
@@ -89,10 +115,43 @@ interval = st.sidebar.selectbox("Choose an interval", periods[period])
 #####Title#####
 
 # Add title to the app
-st.markdown("# **Stock Price Prediction**")
+st.markdown("# **Stock Predictor 3000**")
+col1, col2 = st.columns([1, 3])
+# Display HTML with JavaScript to control GIF animation
+# Display HTML with CSS animation to control GIF animation
 
+
+# GIF
+with col1:
+    gif_url = "https://media.giphy.com/media/JpG2A9P3dPHXaTYrwu/giphy.gif"
+    st.image(gif_url, use_column_width=True)
+    time.sleep(3)
 # Add a subtitle to the app
-st.markdown("##### **Enhance Investment Decisions through Data-Driven Forecasting**")
+st.markdown("##### **Enhance Investment Decisions through Data-Driven Forecasting 💰**")
+
+
+stock_ticker = stock_dict[stock]
+ticker = yf.Ticker(stock_ticker)
+address = ticker.info['address1']
+city = ticker.info['city']
+state = ticker.info['state']
+country = ticker.info['country']
+industry = ticker.info['industry']
+sector = ticker.info['sectorDisp']
+CEO = ticker.info['companyOfficers'][0]['name']
+
+
+#st.subheader(f"About {stock}")
+#put the stock name in the center of the list
+st.markdown(f"<h2 style='text-align: left; color: blue;'>About {stock}</h2>", unsafe_allow_html=True)
+
+col1, col2 = st.columns(2)
+with col1:
+     st.markdown(f"**Address:** {address}, {city}, {state}, {country}")
+     st.markdown(f"**Industry:** {industry}")
+with col2:
+     st.markdown(f"**Sector:** {sector}")
+     st.markdown(f"**CEO:** {CEO}")
 
 #####Title End#####
 
@@ -133,8 +192,6 @@ stock_data_close_train, stock_data_close_test, price_predictions_df = generate_s
 #st.write(forecast)
 #st.write(predictions)
 
-st.write(price_predictions_df)
-st.write(stock_data_close_test)
 
 # Check if the data is not None
 if price_predictions_df is not None:
@@ -208,21 +265,27 @@ if price_predictions_df is not None:
 
     # Use the native streamlit theme.
     st.plotly_chart(fig, use_container_width=True)
+    #Trouble shoot the bug we had to sshow if the model recommends to buy or sell stock
+        # st.write(stock_data_close_test['price'].values[0])
 
-    def return_buy_sell_message():
-        if price_predictions_df['price'][0] - stock_data_close_test['price'][1] > 0:
-            return 'The model recommend you to buy the stock and sell it tomorrow'
+
+def return_buy_sell_message():
+    if price_predictions_df is not None and stock_data_close_test is not None:
+        if price_predictions_df['price'][0] - stock_data_close_test['price'].values[0] > 0:
+            return 'Buy This Stock 🫡'
         else:
-            return 'Sell'
+            return 'Sell This Stock ⚠️'
+    else:
+        return None
 
-    st.write(f'The model recommend that you {return_buy_sell_message()}')
+# Get the recommendation message
+recommendation_message = return_buy_sell_message()
 
-# If the data is None
+# Display the message with center alignment
+if recommendation_message is not None:
+    st.markdown(f"<div style='text-align: center;'><u>The model recommends that you should {recommendation_message}</u></div>", unsafe_allow_html=True)
 else:
     # Add a title to the stock prediction graph
     st.markdown("## **Stock Prediction**")
-
     # Add a message to the stock prediction graph
     st.markdown("### **No data available for the selected stock**")
-
-#####Stock Prediction Graph End#####
