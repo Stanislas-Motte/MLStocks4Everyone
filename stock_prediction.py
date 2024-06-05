@@ -58,7 +58,6 @@ st.sidebar.markdown("## **User Input Features**")
 st.sidebar.markdown("### **Select stock**")
 stock = st.sidebar.selectbox("Choose a stock", list(stock_dict.keys()))
 
-
 # Add a dropdown for selecting the model
 st.sidebar.markdown("### **Select a Model**")
 model = st.sidebar.selectbox("Choose a model", list(models_dict.keys())) # need to create a dict for models instead of stocks.
@@ -155,7 +154,6 @@ with col2:
 
 #####Title End#####
 
-
 # Fetch the stock historical data
 stock_data = fetch_stock_history(stock_ticker, period, interval)
 
@@ -203,21 +201,21 @@ if price_predictions_df is not None:
         data=[
             go.Scatter(
                 x=stock_data_close_train.index,
-                y=stock_data_close_train["price"],
+                y=stock_data_close_train['Close'],
                 name="Train",
                 mode="lines",
                 line=dict(color="blue"),
             ),
             go.Scatter(
                 x=stock_data_close_test.index,
-                y=stock_data_close_test["price"],
+                y=stock_data_close_test['Close'],
                 name="Test",
                 mode="lines",
                 line=dict(color="orange"),
             ),
             go.Scatter(
                 x=stock_data_close_test.index,
-                y=price_predictions_df['price'],
+                y=price_predictions_df['Close'],
                 name="Forecast",
                 mode="lines",
                 line=dict(color="red"),
@@ -231,14 +229,14 @@ if price_predictions_df is not None:
     #     data=[
     #         go.Scatter(
     #             x=train_df.index,
-    #             y=train_df["price"],
+    #             y=train_df['Close'],
     #             name="Train",
     #             mode="lines",
     #             line=dict(color="blue"),
     #         ),
     #         go.Scatter(
     #             x=test_df.index,
-    #             y=test_df["price"],
+    #             y=test_df['Close'],
     #             name="Test",
     #             mode="lines",
     #             line=dict(color="orange"),
@@ -271,7 +269,7 @@ if price_predictions_df is not None:
 
 def return_buy_sell_message():
     if price_predictions_df is not None and stock_data_close_test is not None:
-        if price_predictions_df['price'][0] - stock_data_close_test['price'].values[0] > 0:
+        if price_predictions_df['Close'][0] - stock_data_close_test['Close'].values[0] > 0:
             return 'Buy This Stock 🫡'
         else:
             return 'Sell This Stock ⚠️'
