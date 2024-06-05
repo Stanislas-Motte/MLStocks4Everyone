@@ -189,15 +189,15 @@ def set_up_df(stock_ticker, time = '5y', interval = '1d'):
 # Function to generate the stock prediction
 def generate_stock_prediction(stock_ticker, model):
 
-    #Treat time series diffrently
-    if model == 'ARIMA':
+    # #Treat time series diffrently
+    # if model == 'ARIMA':
 
-        train_prices_df = get_historical_prices(stock_ticker, start_train_date, start_end_date)
-        test_prices_df = get_historical_prices(stock_ticker, start_test_date, end_test_date)
-        # Return the required data
-        return train_prices_df, test_prices_df, price_predictions_df
+    #     train_prices_df = get_historical_prices(stock_ticker, start_train_date, start_end_date)
+    #     test_prices_df = get_historical_prices(stock_ticker, start_test_date, end_test_date)
+    #     # Return the required data
+    #     return train_prices_df, test_prices_df, price_predictions_df
 
-    model = models_dict[model]
+    # model = models_dict[model]
 
     #If the model is an ARIMA model, we will use the ARIMA model and return separately
 
