@@ -8,4 +8,4 @@ streamlit==1.11.1
 sympy==1.12
 xgboost==1.6.2
 yfinance==0.2.40
-statsmodels==0.13.2
+statsmodels

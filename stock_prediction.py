@@ -70,14 +70,14 @@ model = st.sidebar.selectbox("Choose a model", list(models_dict.keys())) # need 
 # stock_ticker = f"{stock_dict[stock]}.{'BO' if stock_exchange == 'BSE' else 'NS'}"
 
 stock_ticker = stock_dict[stock]
-# ticker = yf.Ticker(stock_ticker)
-# address = ticker.info['address1']
-# city = ticker.info['city']
-# state = ticker.info['state']
-# country = ticker.info['country']
-# industry = ticker.info['industry']
-# sector = ticker.info['sectorDisp']
-# CEO = ticker.info['companyOfficers'][0]['name']
+ticker = yf.Ticker(stock_ticker)
+address = ticker.info['address1']
+city = ticker.info['city']
+state = ticker.info['state']
+country = ticker.info['country']
+industry = ticker.info['industry']
+sector = ticker.info['sectorDisp']
+CEO = ticker.info['companyOfficers'][0]['name']
 
 
 # st.subheader(f"About {stock}")
@@ -186,6 +186,7 @@ st.plotly_chart(fig, use_container_width=True)
 
 # Unpack the data
 stock_data_close_train, stock_data_close_test, price_predictions_df = generate_stock_prediction(stock_ticker, model)
+st.write(price_predictions_df)
 
 #st.write(forecast)
 #st.write(predictions)
@@ -282,8 +283,27 @@ recommendation_message = return_buy_sell_message()
 # Display the message with center alignment
 if recommendation_message is not None:
     st.markdown(f"<div style='text-align: center;'><u>The model recommends that you should {recommendation_message}</u></div>", unsafe_allow_html=True)
-else:
-    # Add a title to the stock prediction graph
-    st.markdown("## **Stock Prediction**")
-    # Add a message to the stock prediction graph
-    st.markdown("### **No data available for the selected stock**")
+
+# else:
+#     # Add a title to the stock prediction graph
+#     st.markdown("## **Stock Prediction**")
+#     # Add a message to the stock prediction graph
+#     st.markdown("### **No data available for the selected stock**")
+
+if recommendation_message == 'Buy This Stock 🫡':
+    amount_invested = st.number_input("How much would you like to invest in this stock?", min_value=0.0, step=0.01, format="%.2f")
+    investment_duration = st.number_input("For how many days?", min_value=1, step=1, format="%d")
+    # TODO - Replace the zero in price_predictions_df['Close'].values[0] by the number of days in the input
+    profit = (amount_invested * (price_predictions_df['Close'].values[investment_duration-1] / stock_data_close_test['Close'].values[0]) - amount_invested)
+    st.write(f"You would make a profit of {profit:.2f} if you invest {amount_invested} in this stock")
+
+# VERSION WITH TWO COLUMNS THAT DOESN'T WORK
+# col1, col2 = st.columns([1, 1])
+# if recommendation_message == 'Buy This Stock 🫡':
+#     with col1:
+#         amount_invested = st.number_input("How much would you like to invest in this stock?", min_value=0.0, step=0.01, format="%.2f")
+#     with col2:
+#         investment_duration = st.number_input("For how many days?", min_value=1, step=1, format="%d")
+
+# profit = (amount_invested * (price_predictions_df['Close'].values[investment_duration-1] / stock_data_close_test['Close'].values[0]) - amount_invested)
+# st.write(f"You would make a profit of {profit:.2f} if you invest {amount_invested} in this stock")
