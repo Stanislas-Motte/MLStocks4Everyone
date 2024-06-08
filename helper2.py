@@ -38,7 +38,7 @@ models_dict = {
     "Support Vector Machine": SVR(),
     "K-Nearest Neighbors": KNeighborsRegressor(),
     "Decision Tree": DecisionTreeRegressor(),
-    "ARIMA": ARIMA(),
+#   "ARIMA": ARIMA(),
 }
 
 #Define a dictionary for our saved models
@@ -106,8 +106,6 @@ def get_historical_prices(ticker, start_date, end_date):
     tickerDf = tickerData.history(period='1d', start=start_date_str, end=end_date_str)
 
     return tickerDf[['Close']]
-
-get_historical_prices('AAPL', datetime(2020, 1, 1), datetime(2021, 1, 1))
 
 def set_up_df(stock_ticker, time = '5y', interval = '1d'):
 
@@ -197,13 +195,14 @@ def generate_stock_prediction(stock_ticker, model):
     #     # Return the required data
     #     return train_prices_df, test_prices_df, price_predictions_df
 
-    # model = models_dict[model]
+    model = models_dict[model]
 
     #If the model is an ARIMA model, we will use the ARIMA model and return separately
 
     # Try to generate the predictions
     try:
         #Get X and y
+        # TODO - Change the time and interval to be dynamic based on user input
         X = set_up_df(stock_ticker, time = '5y', interval = '1d')[0]
         y = set_up_df(stock_ticker, time = '5y', interval = '1d')[1]
 
