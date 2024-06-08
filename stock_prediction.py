@@ -30,12 +30,12 @@ models_dict = {
 
 #Create a dict of top 10 stocks including FAANG
 stock_dict = {
-    "Apple Inc. 🍏": "AAPL",
-    "Amazon.com Inc.📦": "AMZN",
-    "Alphabet Inc. 🔤": "GOOGL",
+    "Apple 🍏": "AAPL",
+    "Amazon 📦": "AMZN",
+    "Alphabet 🔤": "GOOGL",
     #"Facebook Inc.": "FB", # because stock info is NaN
-    "Netflix Inc.🍿": "NFLX",
-    "Tesla Inc.⚡": "TSLA",
+    "Netflix 🍿": "NFLX",
+    "Tesla ⚡": "TSLA",
     "Microsoft Corporation 🌐": "MSFT",
     "Alibaba Group Holding Limited 🧞‍♂️": "BABA",
     "NVIDIA Corporation 📟": "NVDA",
@@ -112,21 +112,62 @@ st.sidebar.markdown("### **Select interval**")
 interval = st.sidebar.selectbox("Choose an interval", periods[period])
 
 #####Title#####
+# Custom CSS for styling the title
+st.markdown("""
+    <style>
+    .title {
+        font-size: 48px;
+        font-weight: bold;
+        color: #0000FF;
+        text-align: center;
+        margin-top: 5px;
+        margin-bottom: 1px;
+    }
+    .container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 1px;
+    }
+    .message {
+        font-size: 20px;
+        margin-right: 20px;
+    }
+    .input-box {
+        width: 100px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-# Add title to the app
-st.markdown("# **Stock Predictor 3000**")
-col1, col2 = st.columns([1, 3])
-# Display HTML with JavaScript to control GIF animation
-# Display HTML with CSS animation to control GIF animation
+# Title of the app
+st.markdown('<div class="title">Stock Predictor 3000</div>', unsafe_allow_html=True)
+st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,400&display=swap');
+
+    .subheader {
+        font-family: 'Merriweather', serif;
+        font-size: 20px;
+        font-style: italic;
+        color: #333;
+        text-align: center;
+        margin-top: 1px;
+        margin-bottom: 1px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# Subheader with custom font and italic style
+st.markdown('<div class="subheader">Enhance Investment Decisions through Data-Driven Forecasting 💰</div>', unsafe_allow_html=True)
 
 
-# GIF
-with col1:
-    gif_url = "https://media.giphy.com/media/JpG2A9P3dPHXaTYrwu/giphy.gif"
-    st.image(gif_url, use_column_width=True)
-    time.sleep(3)
+# if we want to add GIF
+# #with col1:
+#     gif_url = "https://media.giphy.com/media/JpG2A9P3dPHXaTYrwu/giphy.gif"
+#     st.image(gif_url, use_column_width=True)
+#     time.sleep(3)
 # Add a subtitle to the app
-st.markdown("##### **Enhance Investment Decisions through Data-Driven Forecasting 💰**")
+
 
 
 stock_ticker = stock_dict[stock]
@@ -142,7 +183,17 @@ CEO = ticker.info['companyOfficers'][0]['name']
 
 #st.subheader(f"About {stock}")
 #put the stock name in the center of the list
-st.markdown(f"<h2 style='text-align: left; color: blue;'>About {stock}</h2>", unsafe_allow_html=True)
+st.markdown("""
+    <style>
+    .custom-header {
+        font-size: 3px; /* Adjust the font size as needed */
+        text-align: left;
+        color: black;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.markdown(f"<h2 style='text-align: left; color: grey;'>About {stock}</h2>", unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 with col1:
@@ -156,12 +207,16 @@ with col2:
 
 # Fetch the stock historical data
 stock_data = fetch_stock_history(stock_ticker, period, interval)
-
 #####Historical Data Graph#####
-
-# Add a title to the historical data graph
-st.markdown("## **Historical Data**")
-
+st.markdown("""
+    <style>
+    .graph-title {
+        margin-bottom: -10px; /* Adjust this value to reduce space below the graph title */
+    }
+    </style>
+    """, unsafe_allow_html=True)
+# Graph title
+st.markdown("## **Historical Data**", unsafe_allow_html=True)
 # Create a plot for the historical data
 fig = go.Figure(
     data=[
@@ -175,6 +230,7 @@ fig = go.Figure(
     ]
 )
 
+
 # Customize the historical data graph
 fig.update_layout(xaxis_rangeslider_visible=False)
 
@@ -186,7 +242,7 @@ st.plotly_chart(fig, use_container_width=True)
 
 # Unpack the data
 stock_data_close_train, stock_data_close_test, price_predictions_df = generate_stock_prediction(stock_ticker, model)
-st.write(price_predictions_df)
+
 
 #st.write(forecast)
 #st.write(predictions)
@@ -290,20 +346,21 @@ if recommendation_message is not None:
 #     # Add a message to the stock prediction graph
 #     st.markdown("### **No data available for the selected stock**")
 
-if recommendation_message == 'Buy This Stock 🫡':
-    amount_invested = st.number_input("How much would you like to invest in this stock?", min_value=0.0, step=0.01, format="%.2f")
-    investment_duration = st.number_input("For how many days?", min_value=1, step=1, format="%d")
-    # TODO - Replace the zero in price_predictions_df['Close'].values[0] by the number of days in the input
-    profit = (amount_invested * (price_predictions_df['Close'].values[investment_duration-1] / stock_data_close_test['Close'].values[0]) - amount_invested)
-    st.write(f"You would make a profit of {profit:.2f} if you invest {amount_invested} in this stock")
-
-# VERSION WITH TWO COLUMNS THAT DOESN'T WORK
-# col1, col2 = st.columns([1, 1])
 # if recommendation_message == 'Buy This Stock 🫡':
-#     with col1:
-#         amount_invested = st.number_input("How much would you like to invest in this stock?", min_value=0.0, step=0.01, format="%.2f")
-#     with col2:
-#         investment_duration = st.number_input("For how many days?", min_value=1, step=1, format="%d")
+#     amount_invested = st.number_input("How much would you like to invest in this stock?", min_value=0.0, step=0.01, format="%.2f")
+#     investment_duration = st.number_input("For how many days?", min_value=1, step=1, format="%d")
+#     # TODO - Replace the zero in price_predictions_df['Close'].values[0] by the number of days in the input
+#     profit = (amount_invested * (price_predictions_df['Close'].values[investment_duration-1] / stock_data_close_test['Close'].values[0]) - amount_invested)
+#     st.write(f"You would make a profit of {profit:.2f} if you invest {amount_invested} in this stock")
 
-# profit = (amount_invested * (price_predictions_df['Close'].values[investment_duration-1] / stock_data_close_test['Close'].values[0]) - amount_invested)
-# st.write(f"You would make a profit of {profit:.2f} if you invest {amount_invested} in this stock")
+# VERSION WITH TWO COLUMNS THAT DOES WORK
+col1, col2 = st.columns([1, 1])
+if recommendation_message == 'Buy This Stock 🫡':
+
+    with col1:
+        amount_invested = st.number_input("How much would you like to invest in this stock?", min_value=1.0, step=0.01, format="%.2f")
+    with col2:
+        investment_duration = st.number_input("For how many days?", min_value=1, step=1, format="%.2d")
+
+profit = (amount_invested * (price_predictions_df['Close'].values[investment_duration-1] / stock_data_close_test['Close'].values[0]) - amount_invested)
+st.write(f"You would make a profit of {profit:.2f} if you invest {amount_invested}$ in this stock")
