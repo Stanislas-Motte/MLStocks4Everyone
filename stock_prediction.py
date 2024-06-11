@@ -24,8 +24,7 @@ models_dict = {
     "Gradient Boosting": GradientBoostingRegressor(),
     "Support Vector Machine": SVR(),
     "K-Nearest Neighbors": KNeighborsRegressor(),
-    "Decision Tree": DecisionTreeRegressor(),
-    "XGBoost": XGBRegressor()
+    "Decision Tree": DecisionTreeRegressor()
 }
 
 #Create a dict of top 10 stocks including FAANG
@@ -47,6 +46,7 @@ st.set_page_config(
     page_title="Stock Price Predictor 3000",
     page_icon="📈",
 )
+
 
 #####Sidebar Start#####
 
@@ -159,15 +159,12 @@ st.markdown("""
 # Subheader with custom font and italic style
 st.markdown('<div class="subheader">Enhance Investment Decisions through Data-Driven Forecasting 💰</div>', unsafe_allow_html=True)
 
-
 # if we want to add GIF
 # #with col1:
 #     gif_url = "https://media.giphy.com/media/JpG2A9P3dPHXaTYrwu/giphy.gif"
 #     st.image(gif_url, use_column_width=True)
 #     time.sleep(3)
 # Add a subtitle to the app
-
-
 
 stock_ticker = stock_dict[stock]
 ticker = yf.Ticker(stock_ticker)
@@ -178,6 +175,7 @@ country = ticker.info['country']
 industry = ticker.info['industry']
 sector = ticker.info['sectorDisp']
 CEO = ticker.info['companyOfficers'][0]['name']
+
 
 
 #st.subheader(f"About {stock}")
@@ -194,13 +192,20 @@ st.markdown("""
 
 st.markdown(f"<h2 style='text-align: left; color: grey;'>About {stock}</h2>", unsafe_allow_html=True)
 
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
+
 with col1:
-     st.markdown(f"**Address:** {address}, {city}, {state}, {country}")
-     st.markdown(f"**Industry:** {industry}")
+    st.markdown(f"**Name:** {ticker.info['longName']}")
+    st.markdown(f"**Industry:** {industry}")
 with col2:
      st.markdown(f"**Sector:** {sector}")
-     st.markdown(f"**CEO:** {CEO}")
+     st.markdown(f"**Market Cap:** {'{:,}'.format(ticker.info['marketCap']) } {ticker.info['currency']}")
+with col3:
+    st.markdown(f"**CEO:** {CEO}")
+    st.markdown(f"**Price:** {ticker.info['previousClose']} {ticker.info['currency']}")
+
+
+st.markdown(f"**Business summary:** {ticker.info['longBusinessSummary']}")
 
 #####Title End#####
 
@@ -232,7 +237,7 @@ fig = go.Figure(
 # Set the width of the graph height=600 # Set the height of the graph ) # Display the plot in Streamlit st.plotly_chart(fig)
 
 # Customize the historical data graph
-fig.update_layout(xaxis_rangeslider_visible=False, width=3000, height=800)
+fig.update_layout(xaxis_rangeslider_visible=False, width=3000, height=500)
 
 # Use the native streamlit theme.
 st.plotly_chart(fig, use_container_width=True)
@@ -242,6 +247,9 @@ st.plotly_chart(fig, use_container_width=True)
 
 # Unpack the data
 stock_data_close_train, stock_data_close_test, price_predictions_df = generate_stock_prediction(stock_ticker, model)
+
+price_pred_array = price_predictions_df['Close']
+close_prices_test = stock_data_close_test['Close']
 
 
 #st.write(forecast)
@@ -316,18 +324,46 @@ if price_predictions_df is not None:
     # )
 
     # Customize the stock prediction graph
-    fig.update_layout(xaxis_rangeslider_visible=False)
+    fig.update_layout(xaxis_rangeslider_visible=False, width=3000, height=800)
 
     # Use the native streamlit theme.
     st.plotly_chart(fig, use_container_width=True)
     #Trouble shoot the bug we had to sshow if the model recommends to buy or sell stock
         # st.write(stock_data_close_test['price'].values[0])
 
+import numpy as np
+dollar_error = np.abs(np.mean(close_prices_test - price_pred_array)).round(2)
+percentage_error = np.abs(np.mean(close_prices_test - price_pred_array) / close_prices_test.mean()).round(2)
 
-amount_invested2 = st.number_input("How much would you like to invest in this stock?", min_value=1, step=1)
+col1, col2 = st.columns([1,1])
+
+with col1:
+    st.markdown("""
+        <div style="background-color: lightgrey; padding: 10px; border-radius: 10px;">
+            <h4>Average error: {0} $</h4>
+        </div>
+        """.format(np.abs(np.mean(close_prices_test - price_pred_array)).round(2)), unsafe_allow_html=True)
+
+with col2:
+    st.markdown("""
+        <div style="background-color: lightgrey; padding: 10px; border-radius: 10px;">
+            <h4>Average error: {0}%</h4>
+        </div>
+        """.format(percentage_error*100), unsafe_allow_html=True)
+
+st.markdown("## **Profits**")
+
+col1, col2 = st.columns([1, 1])
+
+with col1:
+    amount_invested2 = st.number_input("How much would you like to invest in this stock?", min_value=100, step=1)
+with col2:
+    investment_duration = st.number_input("For how many days?", min_value=1, step=1)
+
+ranges = 90
 
 # # Calculate profit for all investment durations from 1 to 30
-profits = [(amount_invested2 * (price_predictions_df['Close'].values[i] / stock_data_close_test['Close'].values[0]) - amount_invested2) for i in range(30)]
+profits = [(amount_invested2 * (price_predictions_df['Close'].values[i] / stock_data_close_test['Close'].values[0]) - amount_invested2) for i in range(90)]
 
 # # Determine the line color based on the comparison of the first and last profit values
 # line_color = "red" if profits[-1] < profits[0] else "green"
@@ -351,7 +387,7 @@ fig2 = go.Figure()
 # Add line trace for profits
 fig2.add_trace(
     go.Scatter(
-        x=list(range(1, 31)),
+        x=list(range(1, ranges+1)),
         y=profits,
         name="Profit",
         mode="lines",
@@ -362,7 +398,7 @@ fig2.add_trace(
 # Add fill trace for profits above zero
 fig2.add_trace(
     go.Scatter(
-        x=list(range(1, 31)),
+        x=list(range(1, ranges+1)),
         y=[p if p >= 0 else 0 for p in profits],
         fill='tonexty',
         fillcolor='rgba(255, 0, 0, 0.2)',  # Light green
@@ -373,13 +409,42 @@ fig2.add_trace(
 # Add fill trace for profits below zero
 fig2.add_trace(
     go.Scatter(
-        x=list(range(1, 31)),
+        x=list(range(1, ranges+1)),
         y=[p if p < 0 else 0 for p in profits],
         fill='tonexty',
         fillcolor='rgba(0, 255, 0, 0.2)',  # Light red
         mode='none'  # This trace will only serve to fill area
     )
 )
+# Add vertical line
+fig2.add_shape(
+    type="line",
+    x0=investment_duration, y0=0,
+    x1=investment_duration, y1=1,
+    yref="paper",  # Use "paper" coordinates for y (range is [0,1])
+    line=dict(
+        color="Red",
+        width=3,
+    ),
+)
+profit = (amount_invested2 * (price_predictions_df['Close'].values[investment_duration-1] / stock_data_close_test['Close'].values[0]) - amount_invested2)
+
+fig2.add_annotation(
+    x=1,  # Adjust as needed
+    y=1,  # Adjust as needed
+    yref="paper",  # Use "paper" coordinates for y (range is [0,1])
+    text="Money made: ${}".format((profit).round(2)),
+    showarrow=False,
+    font=dict(
+        size=16,
+        color="Black"
+    ),
+    bgcolor="White",
+    bordercolor="Black",
+    borderwidth=2,
+    borderpad=4
+)
+
 
 # Customize the plot
 fig2.update_layout(
@@ -394,24 +459,29 @@ fig2.update_layout(
 st.plotly_chart(fig2, use_container_width=True)
 
 
-investment_duration = st.number_input("For how many days?", min_value=1, step=1)
-profit = (amount_invested2 * (price_predictions_df['Close'].values[investment_duration-1] / stock_data_close_test['Close'].values[0]) - amount_invested2)
-st.write(f"You would have {amount_invested2 + profit:.0f}\$ if you invested {amount_invested2}$ in this stock for {investment_duration} days")
-
-#st.write(f"You would make a profit of {profit:.2f} if you invest {amount_invested2}$ in this stock")
-
+profits = [(amount_invested2 * (price_predictions_df['Close'].values[i] / stock_data_close_test['Close'].values[0]) - amount_invested2) for i in range(ranges)]
 
 def return_buy_sell_message():
     if price_predictions_df is not None and stock_data_close_test is not None:
-        if price_predictions_df['Close'][0] - stock_data_close_test['Close'].values[0] > 0:
+        if profits[ranges-1] > 0 :
             return 'Buy This Stock 🫡'
         else:
             return 'Sell This Stock ⚠️'
     else:
         return None
 
+
 # Get the recommendation message
 recommendation_message = return_buy_sell_message()
+
+st.markdown(f'<p style="font-size:25px; color:Black; font-weight:bold; text-align:center">{recommendation_message}</p>', unsafe_allow_html=True)
+
+
+profit = (amount_invested2 * (price_predictions_df['Close'].values[investment_duration-1] / stock_data_close_test['Close'].values[0]) - amount_invested2)
+st.write(f"You would have {amount_invested2 + profit:.0f}\$ if you invested {amount_invested2}$ in this stock for {investment_duration} days")
+
+#st.write(f"You would make a profit of {profit:.2f} if you invest {amount_invested2}$ in this stock")
+
 
 # # Display the message with center alignment
 # if recommendation_message is not None:
