@@ -144,11 +144,15 @@ st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,400&display=swap');
 
+    .title {
+        color: #FFFFFF;  # White color
+    }
+
     .subheader {
         font-family: 'Merriweather', serif;
         font-size: 20px;
         font-style: italic;
-        color: #333;
+        color: #000;
         text-align: center;
         margin-top: 1px;
         margin-bottom: 1px;
@@ -158,7 +162,41 @@ st.markdown("""
 
 # Subheader with custom font and italic style
 st.markdown('<div class="subheader">Enhance Investment Decisions through Data-Driven Forecasting 💰</div>', unsafe_allow_html=True)
+st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,400&display=swap');
 
+    .subheader {
+        font-family: 'Merriweather', serif;
+        font-size: 16px;  # Reduced font size for subtitle
+        font-style: italic;
+        color: #FFFFFF;  # White color
+        text-align: center;
+        margin-top: 1px;
+        margin-bottom: 1px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+from datetime import datetime, timedelta
+
+# Get the current date and time
+now = datetime.now()
+
+# Subtract one day to get the day before today
+day_before = now - timedelta(days=1)
+
+# Subtract five minutes to get the time five minutes ago
+time_five_min_ago = now - timedelta(minutes=5)
+
+# Format the date and time as strings
+date_str = day_before.strftime("%B %d, %Y")  # e.g., "January 01, 2022"
+time_str = time_five_min_ago.strftime("%H:%M:%S")  # e.g., "12:30:45"
+
+# Display the date and time
+st.markdown(f'<p style="text-align:center; font-weight:bold; font-style:italic;">Updated as of {date_str} {time_str}</p>', unsafe_allow_html=True)
+
+# New
 # if we want to add GIF
 # #with col1:
 #     gif_url = "https://media.giphy.com/media/JpG2A9P3dPHXaTYrwu/giphy.gif"
@@ -190,7 +228,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.markdown(f"<h2 style='text-align: left; color: grey;'>About {stock}</h2>", unsafe_allow_html=True)
+st.markdown(f"<h2 style='text-align: left; color: white;'>About {stock}</h2>", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3)
 
@@ -339,14 +377,14 @@ col1, col2 = st.columns([1,1])
 
 with col1:
     st.markdown("""
-        <div style="background-color: lightgrey; padding: 10px; border-radius: 10px;">
+        <div style="background-color: transparent; padding: 10px; border-radius: 10px; border: 1px solid white;">
             <h4>Average error: {0} $</h4>
         </div>
         """.format(np.abs(np.mean(close_prices_test - price_pred_array)).round(2)), unsafe_allow_html=True)
 
 with col2:
     st.markdown("""
-        <div style="background-color: lightgrey; padding: 10px; border-radius: 10px;">
+        <div style="background-color: transparent; padding: 10px; border-radius: 10px; border: 1px solid white;">
             <h4>Average error: {0}%</h4>
         </div>
         """.format(percentage_error*100), unsafe_allow_html=True)
@@ -474,7 +512,7 @@ def return_buy_sell_message():
 # Get the recommendation message
 recommendation_message = return_buy_sell_message()
 
-st.markdown(f'<p style="font-size:25px; color:Black; font-weight:bold; text-align:center">{recommendation_message}</p>', unsafe_allow_html=True)
+st.markdown(f'<p style="font-size:25px; color:white; font-weight:bold; text-align:center">{recommendation_message}</p>', unsafe_allow_html=True)
 
 
 profit = (amount_invested2 * (price_predictions_df['Close'].values[investment_duration-1] / stock_data_close_test['Close'].values[0]) - amount_invested2)
