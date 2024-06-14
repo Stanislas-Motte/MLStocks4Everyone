@@ -21,7 +21,7 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.model_selection import train_test_split
 
 #Import time series models
-from statsmodels.tsa.arima.model import ARIMA
+#from statsmodels.tsa.arima.model import ARIMA
 
 # Define training and testing size
 TRAIN_SIZE = 0.7
